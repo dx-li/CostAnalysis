@@ -1,0 +1,1954 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.4.552">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Empirical analysis of order flow in selected Binance perpetual futures</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script><script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body>
+
+<div id="quarto-search-results"></div>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction">Introduction</a></li>
+  <li><a href="#data-processing" id="toc-data-processing" class="nav-link" data-scroll-target="#data-processing">Data processing</a></li>
+  <li><a href="#statistical-modeling" id="toc-statistical-modeling" class="nav-link" data-scroll-target="#statistical-modeling">Statistical modeling</a></li>
+  <li><a href="#can-we-use-ofi-as-a-signal" id="toc-can-we-use-ofi-as-a-signal" class="nav-link" data-scroll-target="#can-we-use-ofi-as-a-signal">Can we use OFI as a signal?</a></li>
+  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion">Conclusion</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<div class="quarto-title-block"><div><h1 class="title">Empirical analysis of order flow in selected Binance perpetual futures</h1><button type="button" class="btn code-tools-button dropdown-toggle" id="quarto-code-tools-menu" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi"></i> Code</button><ul class="dropdown-menu dropdown-menu-end" aria-labelelledby="quarto-code-tools-menu"><li><a id="quarto-show-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Show All Code</a></li><li><a id="quarto-hide-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Hide All Code</a></li></ul></div></div>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="introduction" class="level1">
+<h1>Introduction</h1>
+<p>The goal of this notebook is to follow some of the analysis of the paper “The price impact of order book events” by Cont, Kukanov, and Stoikov (2012). The later sections, however, do stray away from their analysis slightly. The paper is available <a href="https://papers.ssrn.com/sol3/papers.cfm?abstract_id=1712822">here</a>. Essentially, their paper studies order flow imbalance (OFI) and price impact with empirical analysis on randomly selected US stocks, finding OFI statistically significant in a linear model of instataneous price impact (admittedly, under an idealized order book model). Instead of US stock data, we will be using order book data from Binance (available <a href="https://www.binance.com/en/landing/data">here</a>) for perpetual coin-denominated futures contracts for Bitcoin, Ethereum, and Solana during the period of January 2024 - May 2024. These three were chosen for being high volume traded cryptocurrencies on an overall scale, but analysis of lower volume coins could be of interest as well. Let us define some terms from the paper before we begin.</p>
+<p>Denote <span class="math inline">\(\delta\)</span> to be the tick size. Consider a time interval <span class="math inline">\([t_{k-1}, t_k]\)</span>, let <span class="math inline">\(P^b_k\)</span> be the bid price at time <span class="math inline">\(t_k\)</span> and <span class="math inline">\(P^s_k\)</span> be the respective ask price. Let <span class="math inline">\(P_k = \frac{P_k^b + P_k^s}{2 \delta}\)</span> be the tick-size normalized midprice and denote <span class="math inline">\(\Delta P_k = P_k - P_{k-1}\)</span> to be the midprice change. The tickers data from Binance contains the best bid and best ask price with their respective quantities at every tick. To calculate OFI, firstly consider the observations <span class="math inline">\((P_n^b, q_n^b, P_n^s, q_n^s)\)</span> where <span class="math inline">\(n\)</span> indexes each tick. Let <span class="math display">\[
+e_n = q_n^b \text{ind}(P_n^b \geq P_{n-1}^b) - q_{n-1}^b \text{ind}(P_n^b \leq P_{n-1}^b) - q_n^s \text{ind}(P_n^s \leq P_{n-1}^s) + q_{n-1}^s \text{ind}(P_n^s \geq P_{n-1}^s)
+\]</span> reprsent the signed contributions of order book events to supply/demand.</p>
+<p>Next, the paper considers the two uniform time grids <span class="math inline">\(\{T_0, ..., T_I\}\)</span> and <span class="math inline">\(\{t_{0,0}, ..., t_{I,K}\}\)</span> with <span class="math inline">\(T_i - T_{i-1} = 30\)</span> minutes and <span class="math inline">\(t_{k,i} - t_{k-1,i} = 10\)</span> seconds. Take <span class="math inline">\(N()\)</span> to be a function such that <span class="math inline">\(N(t_{k-1,i}) + 1\)</span> and <span class="math inline">\(N(t_{k,i})\)</span> are the index of the first and last order book event in the interval <span class="math inline">\([t_{k-1, i}, t_{k, i}]\)</span> Then within a large interval <span class="math inline">\([T_{i-1}, T_i]\)</span>, we have <span class="math display">\[\Delta P_{k,i} = \frac{P_{N(t_{k,i})}^b + P_{N(t_{k,i})}^s}{2 \delta} - \frac{P_{N(t_{k-1,i})}^b + P_{N(t_{k-1,i})}^s}{2 \delta}
+\]</span> and <span class="math display">\[\text{OFI}_{k,i} = \sum_{n=N(t_{k-1,i})+1}^{N(t_{k,i})} e_n
+\]</span> The paper then considers the regression model</p>
+<p>The paper also defines an estimator for depth in their stylized model on the interval <span class="math inline">\([T_{i-1}, T_i]\)</span> as <span class="math display">\[
+D_i = \frac{1}{2} \left[
+\frac{
+\sum_{n=N(T_{i-1})+1}^{N(T_i)} \left( q_n^b \text{ind}\left( P_n^b &lt; P_{n-1}^b \right) + q_{n-1}^b \text{ind}\left( P_n^b &gt; P_{n-1}^b \right) \right)
+}{
+\sum_{n=N(T_{i-1})+1}^{N(T_i)} \text{ind}\left( P_n^b \neq P_{n-1}^b \right)
+} +
+\frac{
+\sum_{n=N(T_{i-1})+1}^{N(T_i)} \left( q_n^s \text{ind}\left( P_n^s &gt; P_{n-1}^s \right) + q_{n-1}^s \text{ind}\left( P_n^s &lt; P_{n-1}^s \right) \right)
+}{
+\sum_{n=N(T_{i-1})+1}^{N(T_i)} \text{ind}\left( P_n^s \neq P_{n-1}^s \right)
+}
+\right]
+\]</span> I will not be considering the depth estimator in this notebook, but it could be of interest to consider in the future.</p>
+<p>The model that the paper posits is <span class="math display">\[
+\Delta P_{k,i} = \beta_i \text{OFI}_{k,i} + \epsilon_{k,i}
+\]</span> where one can interpret it as a linear model of the instantaneous price impact of order book events arriving within the interval <span class="math inline">\([t_{k-1}, t_k]\)</span>. We will estimate it for the three perpectual contracts with OLS. There are some practical shortcomings with this model. But we will proceed with it for now. Later, we will consider adjustments to the model.</p>
+</section>
+<section id="data-processing" class="level1">
+<h1>Data processing</h1>
+<p>In this section, I will walk through the process I use to prepare the data for statistical modeling. The data downloaded from Binance comes as a series of csv files, each containing the order book data for a single month. Here is a sample of the data:</p>
+<div id="cell-7" class="cell" data-execution_count="1">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> duckdb</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> glob</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div id="cell-8" class="cell" data-execution_count="2">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>pl.scan_csv(<span class="st">"./data/ticker/BTCUSD_PERP-bookTicker-2024-01.csv"</span>).head(<span class="dv">5</span>).collect()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="2">
+<div>
+<div><style>
+.dataframe > thead > tr,
+.dataframe > tbody > tr {
+  text-align: right;
+  white-space: pre-wrap;
+}
+</style>
+<small>shape: (5, 7)</small>
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th">update_id</th>
+<th data-quarto-table-cell-role="th">best_bid_price</th>
+<th data-quarto-table-cell-role="th">best_bid_qty</th>
+<th data-quarto-table-cell-role="th">best_ask_price</th>
+<th data-quarto-table-cell-role="th">best_ask_qty</th>
+<th data-quarto-table-cell-role="th">transaction_time</th>
+<th data-quarto-table-cell-role="th">event_time</th>
+</tr>
+<tr class="odd">
+<th>i64</th>
+<th>f64</th>
+<th>f64</th>
+<th>f64</th>
+<th>f64</th>
+<th>i64</th>
+<th>i64</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>820182436406</td>
+<td>42305.4</td>
+<td>2672.0</td>
+<td>42305.5</td>
+<td>2584.0</td>
+<td>1704067200007</td>
+<td>1704067200013</td>
+</tr>
+<tr class="even">
+<td>847746096711</td>
+<td>42773.0</td>
+<td>3493.0</td>
+<td>42773.1</td>
+<td>230.0</td>
+<td>1706664547018</td>
+<td>1706664547024</td>
+</tr>
+<tr class="odd">
+<td>820182436440</td>
+<td>42305.4</td>
+<td>3863.0</td>
+<td>42305.5</td>
+<td>2584.0</td>
+<td>1704067200010</td>
+<td>1704067200016</td>
+</tr>
+<tr class="even">
+<td>847746096760</td>
+<td>42773.0</td>
+<td>3639.0</td>
+<td>42773.1</td>
+<td>230.0</td>
+<td>1706664547020</td>
+<td>1706664547027</td>
+</tr>
+<tr class="odd">
+<td>820182436494</td>
+<td>42305.4</td>
+<td>4739.0</td>
+<td>42305.5</td>
+<td>2584.0</td>
+<td>1704067200012</td>
+<td>1704067200024</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+<p>I will go through the data processing steps using BTCUSD_PERP. The same steps will be applied to ETHUSD_PERP and SOLUSD_PERP. Firstly, I will load the data into a DuckDB database since my RAM is limited. I think this might not be the most efficient format for timeseries, but it’s the easiest for me to setup for ingestion. Also, I’m not a SQL expert, so the following queries probably have optimizations. During the process, I will transform the transaction_time and event_time columns into timestamps and calculate the midprices. The distinction between transaction_time and event_time is that the former is when the data got recorded and the latter is when the data is pushed out from the server (see the discussion <a href="https://dev.binance.vision/t/meaning-of-event-time-transaction-time-fields/5449">here</a> or <a href="https://dev.binance.vision/t/add-event-time-field-to-spot-websocket-book-streams/1390">here</a>). The difference between the two is on the order of milliseconds, so I suspect that it’s negligible for our purposes as we will be aggregating on a 10s scale.</p>
+<div id="cell-10" class="cell" data-execution_count="3">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>symbol <span class="op">=</span> <span class="st">"BTCUSD_PERP"</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>tick_size <span class="op">=</span> <span class="fl">0.1</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>data_dir <span class="op">=</span> <span class="st">"./data/ticker"</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>files <span class="op">=</span> <span class="bu">sorted</span>(glob.glob(<span class="ss">f"</span><span class="sc">{</span>data_dir<span class="sc">}</span><span class="ss">/</span><span class="sc">{</span>symbol<span class="sc">}</span><span class="ss">*.csv"</span>))</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>con <span class="op">=</span> duckdb.<span class="ex">connect</span>(<span class="ss">f"</span><span class="sc">{</span>data_dir<span class="sc">}</span><span class="ss">/</span><span class="sc">{</span>symbol<span class="sc">}</span><span class="ss">.db"</span>)</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>cols <span class="op">=</span> <span class="ss">f"update_id, best_bid_price, best_bid_qty, best_ask_price, best_ask_qty, </span><span class="ch">\</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="ss">        ROUND((best_bid_price + best_ask_price) / (2 * </span><span class="sc">{</span>tick_size<span class="sc">}</span><span class="ss">), 1) AS mid_price, </span><span class="ch">\</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="ss">        EPOCH_MS(event_time) AS event_time, EPOCH_MS(transaction_time) AS transaction_time, </span><span class="ch">\</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="ss">        'BTCUSD_PERP' AS symbol"</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>query <span class="op">=</span> <span class="ss">f"""</span><span class="ch">\</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="ss">        CREATE TABLE tick AS SELECT </span><span class="sc">{</span>cols<span class="sc">}</span><span class="ss"> </span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="ss">        FROM read_csv(</span><span class="sc">{</span>files<span class="sc">}</span><span class="ss">)</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="ss">        """</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>con.execute(query)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="3">
+<pre><code>&lt;duckdb.duckdb.DuckDBPyConnection at 0x10ba20d70&gt;</code></pre>
+</div>
+</div>
+<p>Let’s take a quick look at what the data looks like now.</p>
+<div id="cell-12" class="cell" data-execution_count="4">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>con.sql(<span class="st">"SELECT * FROM tick LIMIT 5"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="4">
+<pre><code>┌──────────────┬────────────────┬──────────────┬───┬──────────────────────┬──────────────────────┬─────────────┐
+│  update_id   │ best_bid_price │ best_bid_qty │ … │      event_time      │   transaction_time   │   symbol    │
+│    int64     │     double     │    double    │   │      timestamp       │      timestamp       │   varchar   │
+├──────────────┼────────────────┼──────────────┼───┼──────────────────────┼──────────────────────┼─────────────┤
+│ 820182436406 │        42305.4 │       2672.0 │ … │ 2024-01-01 00:00:0…  │ 2024-01-01 00:00:0…  │ BTCUSD_PERP │
+│ 847746096711 │        42773.0 │       3493.0 │ … │ 2024-01-31 01:29:0…  │ 2024-01-31 01:29:0…  │ BTCUSD_PERP │
+│ 820182436440 │        42305.4 │       3863.0 │ … │ 2024-01-01 00:00:0…  │ 2024-01-01 00:00:0…  │ BTCUSD_PERP │
+│ 847746096760 │        42773.0 │       3639.0 │ … │ 2024-01-31 01:29:0…  │ 2024-01-31 01:29:0…  │ BTCUSD_PERP │
+│ 820182436494 │        42305.4 │       4739.0 │ … │ 2024-01-01 00:00:0…  │ 2024-01-01 00:00:0…  │ BTCUSD_PERP │
+├──────────────┴────────────────┴──────────────┴───┴──────────────────────┴──────────────────────┴─────────────┤
+│ 5 rows                                                                                   9 columns (6 shown) │
+└──────────────────────────────────────────────────────────────────────────────────────────────────────────────┘</code></pre>
+</div>
+</div>
+<div id="cell-13" class="cell" data-execution_count="5">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>con.sql(<span class="st">"SELECT mid_price from tick LIMIT 10"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="5">
+<pre><code>┌───────────┐
+│ mid_price │
+│  double   │
+├───────────┤
+│  423054.5 │
+│  427730.5 │
+│  423054.5 │
+│  427730.5 │
+│  423054.5 │
+│  427730.5 │
+│  423054.5 │
+│  427730.5 │
+│  423054.5 │
+│  427730.5 │
+├───────────┤
+│  10 rows  │
+└───────────┘</code></pre>
+</div>
+</div>
+<div id="cell-14" class="cell" data-execution_count="6">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>con.sql(<span class="st">"SELECT count(update_id) FROM tick"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="6">
+<pre><code>┌──────────────────┐
+│ count(update_id) │
+│      int64       │
+├──────────────────┤
+│        821486019 │
+└──────────────────┘</code></pre>
+</div>
+</div>
+<p>Now I will calculate the <span class="math inline">\(e_n\)</span> as defined above.</p>
+<div id="cell-16" class="cell" data-execution_count="7">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>calculation <span class="op">=</span> <span class="ss">f"""</span><span class="ch">\</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="ss">                WITH cte AS (</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="ss">                SELECT </span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="ss">                        best_bid_qty AS q_b_n,</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="ss">                        LAG(best_bid_qty, 1) OVER (ORDER BY transaction_time, update_id) AS q_b_n_minus_1,</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="ss">                        best_ask_qty AS q_s_n,</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="ss">                        LAG(best_ask_qty, 1) OVER (ORDER BY transaction_time, update_id) AS q_s_n_minus_1,</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a><span class="ss">                        best_bid_price AS P_b_n,</span></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a><span class="ss">                        LAG(best_bid_price, 1) OVER (ORDER BY transaction_time, update_id) AS P_b_n_minus_1,</span></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a><span class="ss">                        best_ask_price AS P_s_n,</span></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a><span class="ss">                        LAG(best_ask_price, 1) OVER (ORDER BY transaction_time, update_id) AS P_s_n_minus_1,</span></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a><span class="ss">                        mid_price,</span></span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a><span class="ss">                        LAG (mid_price, 1) OVER (ORDER BY transaction_time, update_id) AS mid_price_lag,</span></span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a><span class="ss">                        transaction_time,</span></span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a><span class="ss">                        update_id,</span></span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a><span class="ss">                        symbol</span></span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a><span class="ss">                FROM tick</span></span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a><span class="ss">                )</span></span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a><span class="ss">                SELECT </span></span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a><span class="ss">                (</span></span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a><span class="ss">                        q_b_n * CASE WHEN P_b_n &gt;= P_b_n_minus_1 THEN 1 ELSE 0 END</span></span>
+<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a><span class="ss">                        - q_b_n_minus_1 * CASE WHEN P_b_n &lt;= P_b_n_minus_1 THEN 1 ELSE 0 END</span></span>
+<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a><span class="ss">                        - q_s_n * CASE WHEN P_s_n &lt;= P_s_n_minus_1 THEN 1 ELSE 0 END</span></span>
+<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a><span class="ss">                        + q_s_n_minus_1 * CASE WHEN P_s_n &gt;= P_s_n_minus_1 THEN 1 ELSE 0 END</span></span>
+<span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a><span class="ss">                ) AS e_n,</span></span>
+<span id="cb11-26"><a href="#cb11-26" aria-hidden="true" tabindex="-1"></a><span class="ss">                mid_price - mid_price_lag AS mid_price_change,</span></span>
+<span id="cb11-27"><a href="#cb11-27" aria-hidden="true" tabindex="-1"></a><span class="ss">                transaction_time,</span></span>
+<span id="cb11-28"><a href="#cb11-28" aria-hidden="true" tabindex="-1"></a><span class="ss">                symbol</span></span>
+<span id="cb11-29"><a href="#cb11-29" aria-hidden="true" tabindex="-1"></a><span class="ss">                FROM </span></span>
+<span id="cb11-30"><a href="#cb11-30" aria-hidden="true" tabindex="-1"></a><span class="ss">                cte</span></span>
+<span id="cb11-31"><a href="#cb11-31" aria-hidden="true" tabindex="-1"></a><span class="ss">                ORDER BY transaction_time, update_id</span></span>
+<span id="cb11-32"><a href="#cb11-32" aria-hidden="true" tabindex="-1"></a><span class="ss">                """</span></span>
+<span id="cb11-33"><a href="#cb11-33" aria-hidden="true" tabindex="-1"></a>query <span class="op">=</span> <span class="ss">f"""</span><span class="ch">\</span></span>
+<span id="cb11-34"><a href="#cb11-34" aria-hidden="true" tabindex="-1"></a><span class="ss">        CREATE TABLE rolling AS</span></span>
+<span id="cb11-35"><a href="#cb11-35" aria-hidden="true" tabindex="-1"></a><span class="ss">        </span><span class="sc">{</span>calculation<span class="sc">}</span></span>
+<span id="cb11-36"><a href="#cb11-36" aria-hidden="true" tabindex="-1"></a><span class="ss">        """</span></span>
+<span id="cb11-37"><a href="#cb11-37" aria-hidden="true" tabindex="-1"></a>con.execute(query)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="7">
+<pre><code>&lt;duckdb.duckdb.DuckDBPyConnection at 0x10ba20d70&gt;</code></pre>
+</div>
+</div>
+<p>The resulting table looks like this:</p>
+<div id="cell-18" class="cell" data-execution_count="8">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>con.sql(<span class="st">"SELECT * FROM rolling LIMIT 5"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="8">
+<pre><code>┌────────┬──────────────────┬─────────────────────────┬─────────────┐
+│  e_n   │ mid_price_change │    transaction_time     │   symbol    │
+│ double │      double      │        timestamp        │   varchar   │
+├────────┼──────────────────┼─────────────────────────┼─────────────┤
+│   NULL │             NULL │ 2024-01-01 00:00:00.007 │ BTCUSD_PERP │
+│ 1191.0 │              0.0 │ 2024-01-01 00:00:00.01  │ BTCUSD_PERP │
+│  876.0 │              0.0 │ 2024-01-01 00:00:00.012 │ BTCUSD_PERP │
+│  550.0 │              0.0 │ 2024-01-01 00:00:00.014 │ BTCUSD_PERP │
+│    5.0 │              0.0 │ 2024-01-01 00:00:00.015 │ BTCUSD_PERP │
+└────────┴──────────────────┴─────────────────────────┴─────────────┘</code></pre>
+</div>
+</div>
+<p>Finally, let’s aggregate the data into 10s intervals and calculate the OFI and midprice changes. I’ll do <span class="math inline">\((t_{k-1}, t_k]\)</span> so that the midprice change is calculated close to close.</p>
+<div id="cell-20" class="cell" data-execution_count="9">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>query <span class="op">=</span> <span class="ss">f"""</span><span class="ch">\</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="ss">        CREATE TABLE agg_10s AS</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="ss">        WITH min_time_tbl AS (</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="ss">                SELECT date_trunc('year', MIN(transaction_time)) AS min_time</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="ss">                FROM rolling</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a><span class="ss">        )</span></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a><span class="ss">        SELECT </span></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a><span class="ss">        (</span></span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a><span class="ss">                 min_time + INTERVAL '10 seconds' * (FLOOR(DATE_PART('epoch', transaction_time - min_time) / 10) + 1)::INT</span></span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a><span class="ss">        ) AS time_bucket_end,</span></span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a><span class="ss">        SUM(e_n) AS order_flow_imbalance,</span></span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a><span class="ss">        SUM(mid_price_change) AS mid_price_change,</span></span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a><span class="ss">        symbol,</span></span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a><span class="ss">        COUNT(*) AS num_ticks</span></span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a><span class="ss">        FROM rolling, min_time_tbl</span></span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a><span class="ss">        GROUP BY symbol, min_time + INTERVAL '10 seconds' * (FLOOR(DATE_PART('epoch', transaction_time - min_time) / 10) + 1)::INT</span></span>
+<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a><span class="ss">        ORDER BY time_bucket_end</span></span>
+<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a><span class="ss">        """</span></span>
+<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a>con.execute(query)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="9">
+<pre><code>&lt;duckdb.duckdb.DuckDBPyConnection at 0x10ba20d70&gt;</code></pre>
+</div>
+</div>
+<p>Let’s take a quick look at the data to make sure everything looks good.</p>
+<div id="cell-22" class="cell" data-execution_count="10">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>con.sql(<span class="st">"SELECT * FROM agg_10s LIMIT 5"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="10">
+<pre><code>┌─────────────────────┬──────────────────────┬──────────────────┬─────────────┬───────────┐
+│   time_bucket_end   │ order_flow_imbalance │ mid_price_change │   symbol    │ num_ticks │
+│      timestamp      │        double        │      double      │   varchar   │   int64   │
+├─────────────────────┼──────────────────────┼──────────────────┼─────────────┼───────────┤
+│ 2024-01-01 00:00:10 │             -56352.0 │           -171.0 │ BTCUSD_PERP │       898 │
+│ 2024-01-01 00:00:20 │                777.0 │              8.0 │ BTCUSD_PERP │       692 │
+│ 2024-01-01 00:00:30 │              23537.0 │            112.0 │ BTCUSD_PERP │       624 │
+│ 2024-01-01 00:00:40 │              56473.0 │            133.0 │ BTCUSD_PERP │       861 │
+│ 2024-01-01 00:00:50 │               1594.0 │              0.0 │ BTCUSD_PERP │       364 │
+└─────────────────────┴──────────────────────┴──────────────────┴─────────────┴───────────┘</code></pre>
+</div>
+</div>
+<div id="cell-23" class="cell" data-execution_count="11">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>con.close()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>Now I’ll repeat the process for ETHUSD_PERP and SOLUSD_PERP.</p>
+<div id="cell-25" class="cell" data-execution_count="12">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> logging</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> create_db(symbol, data_dir, tick_size):</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>    logging.basicConfig(level<span class="op">=</span>logging.INFO)</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>    logging.info(<span class="ss">f"Creating database for </span><span class="sc">{</span>symbol<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>    files <span class="op">=</span> <span class="bu">sorted</span>(glob.glob(<span class="ss">f"</span><span class="sc">{</span>data_dir<span class="sc">}</span><span class="ss">/</span><span class="sc">{</span>symbol<span class="sc">}</span><span class="ss">*.csv"</span>))</span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">with</span> duckdb.<span class="ex">connect</span>(<span class="ss">f"</span><span class="sc">{</span>data_dir<span class="sc">}</span><span class="ss">/</span><span class="sc">{</span>symbol<span class="sc">}</span><span class="ss">.db"</span>) <span class="im">as</span> con:</span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>        cols <span class="op">=</span> <span class="ss">f"update_id, best_bid_price, best_bid_qty, best_ask_price, best_ask_qty, </span><span class="ch">\</span></span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a><span class="ss">                        ROUND((best_bid_price + best_ask_price) / (2 * </span><span class="sc">{</span>tick_size<span class="sc">}</span><span class="ss">), 1) AS mid_price, </span><span class="ch">\</span></span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a><span class="ss">                        EPOCH_MS(event_time) AS event_time, EPOCH_MS(transaction_time) AS transaction_time, </span><span class="ch">\</span></span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a><span class="ss">                        '</span><span class="sc">{</span>symbol<span class="sc">}</span><span class="ss">' AS symbol"</span></span>
+<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a>        query <span class="op">=</span> <span class="ss">f"""</span><span class="ch">\</span></span>
+<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a><span class="ss">                        CREATE TABLE tick AS SELECT </span><span class="sc">{</span>cols<span class="sc">}</span><span class="ss"> </span></span>
+<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a><span class="ss">                        FROM read_csv(</span><span class="sc">{</span>files<span class="sc">}</span><span class="ss">)</span></span>
+<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a><span class="ss">                        """</span></span>
+<span id="cb20-17"><a href="#cb20-17" aria-hidden="true" tabindex="-1"></a>        con.execute(query)</span>
+<span id="cb20-18"><a href="#cb20-18" aria-hidden="true" tabindex="-1"></a>        logging.info(<span class="st">"Created tick table"</span>)</span>
+<span id="cb20-19"><a href="#cb20-19" aria-hidden="true" tabindex="-1"></a>        calculation <span class="op">=</span> <span class="ss">f"""</span><span class="ch">\</span></span>
+<span id="cb20-20"><a href="#cb20-20" aria-hidden="true" tabindex="-1"></a><span class="ss">                        WITH cte AS (</span></span>
+<span id="cb20-21"><a href="#cb20-21" aria-hidden="true" tabindex="-1"></a><span class="ss">                        SELECT </span></span>
+<span id="cb20-22"><a href="#cb20-22" aria-hidden="true" tabindex="-1"></a><span class="ss">                                best_bid_qty AS q_b_n,</span></span>
+<span id="cb20-23"><a href="#cb20-23" aria-hidden="true" tabindex="-1"></a><span class="ss">                                LAG(best_bid_qty, 1) OVER (ORDER BY transaction_time, update_id) AS q_b_n_minus_1,</span></span>
+<span id="cb20-24"><a href="#cb20-24" aria-hidden="true" tabindex="-1"></a><span class="ss">                                best_ask_qty AS q_s_n,</span></span>
+<span id="cb20-25"><a href="#cb20-25" aria-hidden="true" tabindex="-1"></a><span class="ss">                                LAG(best_ask_qty, 1) OVER (ORDER BY transaction_time, update_id) AS q_s_n_minus_1,</span></span>
+<span id="cb20-26"><a href="#cb20-26" aria-hidden="true" tabindex="-1"></a><span class="ss">                                best_bid_price AS P_b_n,</span></span>
+<span id="cb20-27"><a href="#cb20-27" aria-hidden="true" tabindex="-1"></a><span class="ss">                                LAG(best_bid_price, 1) OVER (ORDER BY transaction_time, update_id) AS P_b_n_minus_1,</span></span>
+<span id="cb20-28"><a href="#cb20-28" aria-hidden="true" tabindex="-1"></a><span class="ss">                                best_ask_price AS P_s_n,</span></span>
+<span id="cb20-29"><a href="#cb20-29" aria-hidden="true" tabindex="-1"></a><span class="ss">                                LAG(best_ask_price, 1) OVER (ORDER BY transaction_time, update_id) AS P_s_n_minus_1,</span></span>
+<span id="cb20-30"><a href="#cb20-30" aria-hidden="true" tabindex="-1"></a><span class="ss">                                mid_price,</span></span>
+<span id="cb20-31"><a href="#cb20-31" aria-hidden="true" tabindex="-1"></a><span class="ss">                                LAG (mid_price, 1) OVER (ORDER BY transaction_time, update_id) AS mid_price_lag,</span></span>
+<span id="cb20-32"><a href="#cb20-32" aria-hidden="true" tabindex="-1"></a><span class="ss">                                transaction_time,</span></span>
+<span id="cb20-33"><a href="#cb20-33" aria-hidden="true" tabindex="-1"></a><span class="ss">                                update_id,</span></span>
+<span id="cb20-34"><a href="#cb20-34" aria-hidden="true" tabindex="-1"></a><span class="ss">                                symbol</span></span>
+<span id="cb20-35"><a href="#cb20-35" aria-hidden="true" tabindex="-1"></a><span class="ss">                        FROM tick</span></span>
+<span id="cb20-36"><a href="#cb20-36" aria-hidden="true" tabindex="-1"></a><span class="ss">                        )</span></span>
+<span id="cb20-37"><a href="#cb20-37" aria-hidden="true" tabindex="-1"></a><span class="ss">                        SELECT </span></span>
+<span id="cb20-38"><a href="#cb20-38" aria-hidden="true" tabindex="-1"></a><span class="ss">                        (</span></span>
+<span id="cb20-39"><a href="#cb20-39" aria-hidden="true" tabindex="-1"></a><span class="ss">                                q_b_n * CASE WHEN P_b_n &gt;= P_b_n_minus_1 THEN 1 ELSE 0 END</span></span>
+<span id="cb20-40"><a href="#cb20-40" aria-hidden="true" tabindex="-1"></a><span class="ss">                                - q_b_n_minus_1 * CASE WHEN P_b_n &lt;= P_b_n_minus_1 THEN 1 ELSE 0 END</span></span>
+<span id="cb20-41"><a href="#cb20-41" aria-hidden="true" tabindex="-1"></a><span class="ss">                                - q_s_n * CASE WHEN P_s_n &lt;= P_s_n_minus_1 THEN 1 ELSE 0 END</span></span>
+<span id="cb20-42"><a href="#cb20-42" aria-hidden="true" tabindex="-1"></a><span class="ss">                                + q_s_n_minus_1 * CASE WHEN P_s_n &gt;= P_s_n_minus_1 THEN 1 ELSE 0 END</span></span>
+<span id="cb20-43"><a href="#cb20-43" aria-hidden="true" tabindex="-1"></a><span class="ss">                        ) AS e_n,</span></span>
+<span id="cb20-44"><a href="#cb20-44" aria-hidden="true" tabindex="-1"></a><span class="ss">                        mid_price - mid_price_lag AS mid_price_change,</span></span>
+<span id="cb20-45"><a href="#cb20-45" aria-hidden="true" tabindex="-1"></a><span class="ss">                        transaction_time,</span></span>
+<span id="cb20-46"><a href="#cb20-46" aria-hidden="true" tabindex="-1"></a><span class="ss">                        symbol</span></span>
+<span id="cb20-47"><a href="#cb20-47" aria-hidden="true" tabindex="-1"></a><span class="ss">                        FROM </span></span>
+<span id="cb20-48"><a href="#cb20-48" aria-hidden="true" tabindex="-1"></a><span class="ss">                        cte</span></span>
+<span id="cb20-49"><a href="#cb20-49" aria-hidden="true" tabindex="-1"></a><span class="ss">                        ORDER BY transaction_time, update_id</span></span>
+<span id="cb20-50"><a href="#cb20-50" aria-hidden="true" tabindex="-1"></a><span class="ss">                        """</span></span>
+<span id="cb20-51"><a href="#cb20-51" aria-hidden="true" tabindex="-1"></a>        query <span class="op">=</span> <span class="ss">f"""</span><span class="ch">\</span></span>
+<span id="cb20-52"><a href="#cb20-52" aria-hidden="true" tabindex="-1"></a><span class="ss">                        CREATE TABLE rolling AS</span></span>
+<span id="cb20-53"><a href="#cb20-53" aria-hidden="true" tabindex="-1"></a><span class="ss">                        </span><span class="sc">{</span>calculation<span class="sc">}</span></span>
+<span id="cb20-54"><a href="#cb20-54" aria-hidden="true" tabindex="-1"></a><span class="ss">                        """</span></span>
+<span id="cb20-55"><a href="#cb20-55" aria-hidden="true" tabindex="-1"></a>        con.execute(query)</span>
+<span id="cb20-56"><a href="#cb20-56" aria-hidden="true" tabindex="-1"></a>        logging.info(<span class="st">"Created rolling table"</span>)</span>
+<span id="cb20-57"><a href="#cb20-57" aria-hidden="true" tabindex="-1"></a>        query <span class="op">=</span> <span class="ss">f"""</span><span class="ch">\</span></span>
+<span id="cb20-58"><a href="#cb20-58" aria-hidden="true" tabindex="-1"></a><span class="ss">                CREATE TABLE agg_10s AS</span></span>
+<span id="cb20-59"><a href="#cb20-59" aria-hidden="true" tabindex="-1"></a><span class="ss">                WITH min_time_tbl AS (</span></span>
+<span id="cb20-60"><a href="#cb20-60" aria-hidden="true" tabindex="-1"></a><span class="ss">                        SELECT date_trunc('year', MIN(transaction_time)) AS min_time</span></span>
+<span id="cb20-61"><a href="#cb20-61" aria-hidden="true" tabindex="-1"></a><span class="ss">                        FROM rolling</span></span>
+<span id="cb20-62"><a href="#cb20-62" aria-hidden="true" tabindex="-1"></a><span class="ss">                )</span></span>
+<span id="cb20-63"><a href="#cb20-63" aria-hidden="true" tabindex="-1"></a><span class="ss">                SELECT </span></span>
+<span id="cb20-64"><a href="#cb20-64" aria-hidden="true" tabindex="-1"></a><span class="ss">                (</span></span>
+<span id="cb20-65"><a href="#cb20-65" aria-hidden="true" tabindex="-1"></a><span class="ss">                        min_time + INTERVAL '10 seconds' * (FLOOR(DATE_PART('epoch', transaction_time - min_time) / 10) + 1)::INT</span></span>
+<span id="cb20-66"><a href="#cb20-66" aria-hidden="true" tabindex="-1"></a><span class="ss">                ) AS time_bucket_end,</span></span>
+<span id="cb20-67"><a href="#cb20-67" aria-hidden="true" tabindex="-1"></a><span class="ss">                SUM(e_n) AS order_flow_imbalance,</span></span>
+<span id="cb20-68"><a href="#cb20-68" aria-hidden="true" tabindex="-1"></a><span class="ss">                SUM(mid_price_change) AS mid_price_change,</span></span>
+<span id="cb20-69"><a href="#cb20-69" aria-hidden="true" tabindex="-1"></a><span class="ss">                symbol,</span></span>
+<span id="cb20-70"><a href="#cb20-70" aria-hidden="true" tabindex="-1"></a><span class="ss">                COUNT(*) AS num_ticks</span></span>
+<span id="cb20-71"><a href="#cb20-71" aria-hidden="true" tabindex="-1"></a><span class="ss">                FROM rolling, min_time_tbl</span></span>
+<span id="cb20-72"><a href="#cb20-72" aria-hidden="true" tabindex="-1"></a><span class="ss">                GROUP BY symbol, min_time + INTERVAL '10 seconds' * (FLOOR(DATE_PART('epoch', transaction_time - min_time) / 10) + 1)::INT</span></span>
+<span id="cb20-73"><a href="#cb20-73" aria-hidden="true" tabindex="-1"></a><span class="ss">                ORDER BY time_bucket_end</span></span>
+<span id="cb20-74"><a href="#cb20-74" aria-hidden="true" tabindex="-1"></a><span class="ss">                """</span></span>
+<span id="cb20-75"><a href="#cb20-75" aria-hidden="true" tabindex="-1"></a>        con.execute(query)</span>
+<span id="cb20-76"><a href="#cb20-76" aria-hidden="true" tabindex="-1"></a>        logging.info(<span class="st">"Created agg_10s table"</span>)</span>
+<span id="cb20-77"><a href="#cb20-77" aria-hidden="true" tabindex="-1"></a>    logging.info(<span class="ss">f"Finished creating database for </span><span class="sc">{</span>symbol<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb20-78"><a href="#cb20-78" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-79"><a href="#cb20-79" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-80"><a href="#cb20-80" aria-hidden="true" tabindex="-1"></a>eth_tick_size <span class="op">=</span> <span class="fl">0.01</span></span>
+<span id="cb20-81"><a href="#cb20-81" aria-hidden="true" tabindex="-1"></a>sol_tick_size <span class="op">=</span> <span class="fl">0.001</span></span>
+<span id="cb20-82"><a href="#cb20-82" aria-hidden="true" tabindex="-1"></a>create_db(<span class="st">"ETHUSD_PERP"</span>, <span class="st">"./data/ticker"</span>, eth_tick_size)</span>
+<span id="cb20-83"><a href="#cb20-83" aria-hidden="true" tabindex="-1"></a>create_db(<span class="st">"SOLUSD_PERP"</span>, <span class="st">"./data/ticker"</span>, sol_tick_size)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stderr">
+<pre><code>INFO:root:Creating database for ETHUSD_PERP
+INFO:root:Created tick table
+INFO:root:Created rolling table
+INFO:root:Created agg_10s table
+INFO:root:Finished creating database for ETHUSD_PERP
+INFO:root:Creating database for SOLUSD_PERP
+INFO:root:Created tick table
+INFO:root:Created rolling table
+INFO:root:Created agg_10s table
+INFO:root:Finished creating database for SOLUSD_PERP</code></pre>
+</div>
+</div>
+<p>Overall, we have data that looks like this:</p>
+<div id="cell-27" class="cell" data-execution_count="13">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>data_dir <span class="op">=</span> <span class="st">"./data/ticker"</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>symbols <span class="op">=</span> [<span class="st">"BTCUSD_PERP"</span>, <span class="st">"ETHUSD_PERP"</span>, <span class="st">"SOLUSD_PERP"</span>]</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> symbol <span class="kw">in</span> symbols:</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">with</span> duckdb.<span class="ex">connect</span>(<span class="ss">f"</span><span class="sc">{</span>data_dir<span class="sc">}</span><span class="ss">/</span><span class="sc">{</span>symbol<span class="sc">}</span><span class="ss">.db"</span>) <span class="im">as</span> con:</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(con.sql(<span class="st">"SELECT COUNT(*) FROM agg_10s"</span>))</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(con.sql(<span class="st">"SELECT * FROM agg_10s LIMIT 5 OFFSET 200000"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>┌──────────────┐
+│ count_star() │
+│    int64     │
+├──────────────┤
+│      1313280 │
+└──────────────┘
+
+┌─────────────────────┬──────────────────────┬──────────────────┬─────────────┬───────────┐
+│   time_bucket_end   │ order_flow_imbalance │ mid_price_change │   symbol    │ num_ticks │
+│      timestamp      │        double        │      double      │   varchar   │   int64   │
+├─────────────────────┼──────────────────────┼──────────────────┼─────────────┼───────────┤
+│ 2024-01-24 03:33:30 │              -3388.0 │            -14.0 │ BTCUSD_PERP │       228 │
+│ 2024-01-24 03:33:40 │             -24267.0 │           -144.0 │ BTCUSD_PERP │       617 │
+│ 2024-01-24 03:33:50 │               4203.0 │             53.0 │ BTCUSD_PERP │       371 │
+│ 2024-01-24 03:34:00 │              61317.0 │            143.0 │ BTCUSD_PERP │       765 │
+│ 2024-01-24 03:34:10 │               9844.0 │            100.0 │ BTCUSD_PERP │       344 │
+└─────────────────────┴──────────────────────┴──────────────────┴─────────────┴───────────┘
+
+┌──────────────┐
+│ count_star() │
+│    int64     │
+├──────────────┤
+│      1313280 │
+└──────────────┘
+
+┌─────────────────────┬──────────────────────┬──────────────────┬─────────────┬───────────┐
+│   time_bucket_end   │ order_flow_imbalance │ mid_price_change │   symbol    │ num_ticks │
+│      timestamp      │        double        │      double      │   varchar   │   int64   │
+├─────────────────────┼──────────────────────┼──────────────────┼─────────────┼───────────┤
+│ 2024-01-24 03:33:30 │              63829.0 │             31.0 │ ETHUSD_PERP │       333 │
+│ 2024-01-24 03:33:40 │            -194578.0 │           -116.0 │ ETHUSD_PERP │       633 │
+│ 2024-01-24 03:33:50 │             245886.0 │             25.0 │ ETHUSD_PERP │       456 │
+│ 2024-01-24 03:34:00 │             338321.0 │             93.0 │ ETHUSD_PERP │       494 │
+│ 2024-01-24 03:34:10 │             233834.0 │             56.0 │ ETHUSD_PERP │       495 │
+└─────────────────────┴──────────────────────┴──────────────────┴─────────────┴───────────┘
+
+┌──────────────┐
+│ count_star() │
+│    int64     │
+├──────────────┤
+│      1313280 │
+└──────────────┘
+
+┌─────────────────────┬──────────────────────┬──────────────────┬─────────────┬───────────┐
+│   time_bucket_end   │ order_flow_imbalance │ mid_price_change │   symbol    │ num_ticks │
+│      timestamp      │        double        │      double      │   varchar   │   int64   │
+├─────────────────────┼──────────────────────┼──────────────────┼─────────────┼───────────┤
+│ 2024-01-24 03:33:30 │               1083.0 │              3.0 │ SOLUSD_PERP │        79 │
+│ 2024-01-24 03:33:40 │              -6630.0 │            -63.0 │ SOLUSD_PERP │       140 │
+│ 2024-01-24 03:33:50 │               5584.0 │             41.5 │ SOLUSD_PERP │        90 │
+│ 2024-01-24 03:34:00 │               9863.0 │             70.5 │ SOLUSD_PERP │       137 │
+│ 2024-01-24 03:34:10 │               1103.0 │            -18.0 │ SOLUSD_PERP │       115 │
+└─────────────────────┴──────────────────────┴──────────────────┴─────────────┴───────────┘
+</code></pre>
+</div>
+</div>
+<p>The activity in SOL seems lower than the other two.</p>
+</section>
+<section id="statistical-modeling" class="level1">
+<h1>Statistical modeling</h1>
+<p>Recall, the model we are interested in is <span class="math display">\[
+\Delta P_{k,i} = \beta_i \text{OFI}_{k,i} + \epsilon_{k,i}
+\]</span> Through OLS, we will estimate <span class="math display">\[
+\Delta P_{k,i} = \hat{\alpha}_i + \hat{\beta}_i \text{OFI}_{k,i} + \hat{\epsilon}_{k,i}
+\]</span> for each of the three contracts. The aggregated data is small enough to fit in memory, so I will switch to Pandas and statsmodels for this part. When fitting the models, the paper uses HAC standard errors to account for autocorrelation in the residuals. I will do the same.</p>
+<div id="cell-30" class="cell" data-execution_count="14">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> statsmodels.formula.api <span class="im">as</span> smf</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> diagnostics <span class="im">import</span> LinearRegDiagnostic</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>Let’s first make a plot for a random interval for BTCUSD_PERP to see if there is any visual correlation between OFI and midprice change.</p>
+<div id="cell-32" class="cell" data-execution_count="15">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>np.random.seed(<span class="dv">42</span>)</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>instance <span class="op">=</span> np.random.randint(<span class="dv">0</span>, <span class="dv">1313280</span> <span class="op">//</span> <span class="dv">180</span>)</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> duckdb.<span class="ex">connect</span>(<span class="ss">f"</span><span class="sc">{</span>data_dir<span class="sc">}</span><span class="ss">/</span><span class="sc">{</span>symbol<span class="sc">}</span><span class="ss">.db"</span>) <span class="im">as</span> con:</span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>    df <span class="op">=</span> con.sql(<span class="st">"SELECT * FROM agg_10s"</span>).to_df()</span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>    df <span class="op">=</span> df.iloc[instance <span class="op">*</span> <span class="dv">180</span> : (instance <span class="op">+</span> <span class="dv">1</span>) <span class="op">*</span> <span class="dv">180</span>]</span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>    model <span class="op">=</span> smf.ols(<span class="st">"mid_price_change ~ order_flow_imbalance"</span>, data<span class="op">=</span>df)</span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>    res <span class="op">=</span> model.fit(cov_type<span class="op">=</span><span class="st">"HAC"</span>, cov_kwds<span class="op">=</span>{<span class="st">"maxlags"</span>: <span class="bu">int</span>(<span class="dv">180</span><span class="op">**</span><span class="fl">0.25</span>)})</span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>    sns.scatterplot(data<span class="op">=</span>df, x<span class="op">=</span><span class="st">"order_flow_imbalance"</span>, y<span class="op">=</span><span class="st">"mid_price_change"</span>)</span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>    sns.lineplot(x<span class="op">=</span>df.order_flow_imbalance, y<span class="op">=</span>res.fittedvalues, color<span class="op">=</span><span class="st">"red"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Analysis_files/figure-html/cell-16-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>It does seem like there is a linear relationship between the two, for this interval at least. I’ll now fit the model for all the 30 minute intervals for each of the three contracts.</p>
+<div id="cell-34" class="cell" data-execution_count="16">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Results:</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>):</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.alphas <span class="op">=</span> []</span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.betas <span class="op">=</span> []</span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.alphas_p <span class="op">=</span> []</span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.betas_p <span class="op">=</span> []</span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.r2 <span class="op">=</span> []</span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> summarize(<span class="va">self</span>):</span>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a>        signif_alphas <span class="op">=</span> np.<span class="bu">sum</span>(np.array(<span class="va">self</span>.alphas_p) <span class="op">&lt;</span> <span class="fl">0.05</span>) <span class="op">/</span> <span class="bu">len</span>(<span class="va">self</span>.alphas_p)</span>
+<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a>        signif_betas <span class="op">=</span> np.<span class="bu">sum</span>(np.array(<span class="va">self</span>.betas_p) <span class="op">&lt;</span> <span class="fl">0.05</span>) <span class="op">/</span> <span class="bu">len</span>(<span class="va">self</span>.betas_p)</span>
+<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a>        avg_r2 <span class="op">=</span> np.mean(<span class="va">self</span>.r2)</span>
+<span id="cb26-13"><a href="#cb26-13" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> pd.DataFrame(</span>
+<span id="cb26-14"><a href="#cb26-14" aria-hidden="true" tabindex="-1"></a>            {</span>
+<span id="cb26-15"><a href="#cb26-15" aria-hidden="true" tabindex="-1"></a>                <span class="st">"signif_alphas"</span>: [signif_alphas],</span>
+<span id="cb26-16"><a href="#cb26-16" aria-hidden="true" tabindex="-1"></a>                <span class="st">"signif_betas"</span>: [signif_betas],</span>
+<span id="cb26-17"><a href="#cb26-17" aria-hidden="true" tabindex="-1"></a>                <span class="st">"avg_r2"</span>: [avg_r2],</span>
+<span id="cb26-18"><a href="#cb26-18" aria-hidden="true" tabindex="-1"></a>            }</span>
+<span id="cb26-19"><a href="#cb26-19" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb26-20"><a href="#cb26-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-21"><a href="#cb26-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-22"><a href="#cb26-22" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> global_summary(<span class="op">*</span>results):</span>
+<span id="cb26-23"><a href="#cb26-23" aria-hidden="true" tabindex="-1"></a>    dfs <span class="op">=</span> [result.summarize() <span class="cf">for</span> result <span class="kw">in</span> results]</span>
+<span id="cb26-24"><a href="#cb26-24" aria-hidden="true" tabindex="-1"></a>    concacted <span class="op">=</span> pd.concat(dfs)</span>
+<span id="cb26-25"><a href="#cb26-25" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> concacted.mean()</span>
+<span id="cb26-26"><a href="#cb26-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-27"><a href="#cb26-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-28"><a href="#cb26-28" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> estimate_regressions(symbol, data_dir, every<span class="op">=</span><span class="dv">180</span>):</span>
+<span id="cb26-29"><a href="#cb26-29" aria-hidden="true" tabindex="-1"></a>    con <span class="op">=</span> duckdb.<span class="ex">connect</span>(<span class="ss">f"</span><span class="sc">{</span>data_dir<span class="sc">}</span><span class="ss">/</span><span class="sc">{</span>symbol<span class="sc">}</span><span class="ss">.db"</span>)</span>
+<span id="cb26-30"><a href="#cb26-30" aria-hidden="true" tabindex="-1"></a>    query <span class="op">=</span> <span class="ss">f"""</span><span class="ch">\</span></span>
+<span id="cb26-31"><a href="#cb26-31" aria-hidden="true" tabindex="-1"></a><span class="ss">            SELECT * FROM agg_10s</span></span>
+<span id="cb26-32"><a href="#cb26-32" aria-hidden="true" tabindex="-1"></a><span class="ss">            """</span></span>
+<span id="cb26-33"><a href="#cb26-33" aria-hidden="true" tabindex="-1"></a>    df <span class="op">=</span> con.execute(query).df()</span>
+<span id="cb26-34"><a href="#cb26-34" aria-hidden="true" tabindex="-1"></a>    con.close()</span>
+<span id="cb26-35"><a href="#cb26-35" aria-hidden="true" tabindex="-1"></a>    results <span class="op">=</span> Results()</span>
+<span id="cb26-36"><a href="#cb26-36" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">0</span>, <span class="bu">len</span>(df), every):</span>
+<span id="cb26-37"><a href="#cb26-37" aria-hidden="true" tabindex="-1"></a>        model <span class="op">=</span> smf.ols(</span>
+<span id="cb26-38"><a href="#cb26-38" aria-hidden="true" tabindex="-1"></a>            <span class="st">"mid_price_change ~ order_flow_imbalance"</span>, data<span class="op">=</span>df.iloc[i : i <span class="op">+</span> every]</span>
+<span id="cb26-39"><a href="#cb26-39" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb26-40"><a href="#cb26-40" aria-hidden="true" tabindex="-1"></a>        res <span class="op">=</span> model.fit(cov_type<span class="op">=</span><span class="st">"HAC"</span>, cov_kwds<span class="op">=</span>{<span class="st">"maxlags"</span>: <span class="bu">int</span>(every<span class="op">**</span><span class="fl">0.25</span>)})</span>
+<span id="cb26-41"><a href="#cb26-41" aria-hidden="true" tabindex="-1"></a>        results.alphas.append(res.params[<span class="st">"Intercept"</span>])</span>
+<span id="cb26-42"><a href="#cb26-42" aria-hidden="true" tabindex="-1"></a>        results.betas.append(res.params[<span class="st">"order_flow_imbalance"</span>])</span>
+<span id="cb26-43"><a href="#cb26-43" aria-hidden="true" tabindex="-1"></a>        results.alphas_p.append(res.pvalues[<span class="st">"Intercept"</span>])</span>
+<span id="cb26-44"><a href="#cb26-44" aria-hidden="true" tabindex="-1"></a>        results.betas_p.append(res.pvalues[<span class="st">"order_flow_imbalance"</span>])</span>
+<span id="cb26-45"><a href="#cb26-45" aria-hidden="true" tabindex="-1"></a>        results.r2.append(res.rsquared)</span>
+<span id="cb26-46"><a href="#cb26-46" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> results</span>
+<span id="cb26-47"><a href="#cb26-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-48"><a href="#cb26-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-49"><a href="#cb26-49" aria-hidden="true" tabindex="-1"></a>btc_results <span class="op">=</span> estimate_regressions(<span class="st">"BTCUSD_PERP"</span>, <span class="st">"./data/ticker"</span>)</span>
+<span id="cb26-50"><a href="#cb26-50" aria-hidden="true" tabindex="-1"></a>eth_results <span class="op">=</span> estimate_regressions(<span class="st">"ETHUSD_PERP"</span>, <span class="st">"./data/ticker"</span>)</span>
+<span id="cb26-51"><a href="#cb26-51" aria-hidden="true" tabindex="-1"></a>sol_results <span class="op">=</span> estimate_regressions(<span class="st">"SOLUSD_PERP"</span>, <span class="st">"./data/ticker"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div id="cell-35" class="cell" data-execution_count="17">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>btc_results.summarize()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="17">
+<div>
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">signif_alphas</th>
+<th data-quarto-table-cell-role="th">signif_betas</th>
+<th data-quarto-table-cell-role="th">avg_r2</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>0.204221</td>
+<td>1.0</td>
+<td>0.697402</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+</div>
+<div id="cell-36" class="cell" data-execution_count="18">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>eth_results.summarize()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="18">
+<div>
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">signif_alphas</th>
+<th data-quarto-table-cell-role="th">signif_betas</th>
+<th data-quarto-table-cell-role="th">avg_r2</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>0.310444</td>
+<td>0.999863</td>
+<td>0.706825</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+</div>
+<div id="cell-37" class="cell" data-execution_count="19">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>sol_results.summarize()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="19">
+<div>
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">signif_alphas</th>
+<th data-quarto-table-cell-role="th">signif_betas</th>
+<th data-quarto-table-cell-role="th">avg_r2</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>0.263569</td>
+<td>0.992325</td>
+<td>0.542729</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+</div>
+<div id="cell-38" class="cell" data-execution_count="20">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>global_summary(btc_results, eth_results, sol_results)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="20">
+<pre><code>signif_alphas    0.259412
+signif_betas     0.997396
+avg_r2           0.648985
+dtype: float64</code></pre>
+</div>
+</div>
+<div id="cell-39" class="cell" data-execution_count="21">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> statsmodels.stats.multitest <span class="im">import</span> multipletests</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>reject, _, _, _ <span class="op">=</span> multipletests(</span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>    np.array(sol_results.betas_p), alpha<span class="op">=</span><span class="fl">0.05</span>, method<span class="op">=</span><span class="st">"fdr_bh"</span></span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>np.average(reject)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="21">
+<pre><code>np.float64(0.9923245614035088)</code></pre>
+</div>
+</div>
+<p>Overall, we have similar results as the paper. <span class="math inline">\(\hat{\beta}\)</span> is significant (when p-value is &lt; .05) in &gt;99% of the cases. The <span class="math inline">\(R^2\)</span> values average to around 65%. So a linear model of instantaneous price-impact does quite well. Let’s try using 1 hour sized intervals instead of 30 minutes.</p>
+<div id="cell-41" class="cell" data-execution_count="22">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>btc_results_hr <span class="op">=</span> estimate_regressions(<span class="st">"BTCUSD_PERP"</span>, <span class="st">"./data/ticker"</span>, every<span class="op">=</span><span class="dv">360</span>)</span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>eth_results_hr <span class="op">=</span> estimate_regressions(<span class="st">"ETHUSD_PERP"</span>, <span class="st">"./data/ticker"</span>, every<span class="op">=</span><span class="dv">360</span>)</span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>sol_results_hr <span class="op">=</span> estimate_regressions(<span class="st">"SOLUSD_PERP"</span>, <span class="st">"./data/ticker"</span>, every<span class="op">=</span><span class="dv">360</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div id="cell-42" class="cell" data-execution_count="23">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>btc_results_hr.summarize()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="23">
+<div>
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">signif_alphas</th>
+<th data-quarto-table-cell-role="th">signif_betas</th>
+<th data-quarto-table-cell-role="th">avg_r2</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>0.238761</td>
+<td>1.0</td>
+<td>0.680708</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+</div>
+<div id="cell-43" class="cell" data-execution_count="24">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>eth_results_hr.summarize()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="24">
+<div>
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">signif_alphas</th>
+<th data-quarto-table-cell-role="th">signif_betas</th>
+<th data-quarto-table-cell-role="th">avg_r2</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>0.33909</td>
+<td>1.0</td>
+<td>0.690052</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+</div>
+<div id="cell-44" class="cell" data-execution_count="25">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>sol_results_hr.summarize()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="25">
+<div>
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">signif_alphas</th>
+<th data-quarto-table-cell-role="th">signif_betas</th>
+<th data-quarto-table-cell-role="th">avg_r2</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>0.26261</td>
+<td>0.996436</td>
+<td>0.520113</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+</div>
+<div id="cell-45" class="cell" data-execution_count="26">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>global_summary(btc_results_hr, eth_results_hr, sol_results_hr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="26">
+<pre><code>signif_alphas    0.280154
+signif_betas     0.998812
+avg_r2           0.630291
+dtype: float64</code></pre>
+</div>
+</div>
+<p>We have similar findings for the hourly intervals too, indicating that the model could be robust over different time scales. I will not try different aggregations on the smaller time scale (e.g.&nbsp;5s or 1s instead of 10s) as it just takes too long to run on my machine.</p>
+<p>Is this model useful in a practical setting to make trades? Probably not. For one, it estimates the price impact over a time interval using data from that very same interval. The original paper proposes a way to use this method of analysis as a monitoring mechanism for adverse selection. I will not go into that here, but it could be of interest to explore in the future. Now, if we try to predict the change in the next interval, performance drops significantly.</p>
+<div id="cell-47" class="cell" data-execution_count="27">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> estimate_regressions_fwd(symbol, data_dir, every<span class="op">=</span><span class="dv">180</span>):</span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>    con <span class="op">=</span> duckdb.<span class="ex">connect</span>(<span class="ss">f"</span><span class="sc">{</span>data_dir<span class="sc">}</span><span class="ss">/</span><span class="sc">{</span>symbol<span class="sc">}</span><span class="ss">.db"</span>)</span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>    query <span class="op">=</span> <span class="ss">f"""</span><span class="ch">\</span></span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a><span class="ss">            SELECT * FROM agg_10s</span></span>
+<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a><span class="ss">            """</span></span>
+<span id="cb40-6"><a href="#cb40-6" aria-hidden="true" tabindex="-1"></a>    df <span class="op">=</span> con.execute(query).df()</span>
+<span id="cb40-7"><a href="#cb40-7" aria-hidden="true" tabindex="-1"></a>    con.close()</span>
+<span id="cb40-8"><a href="#cb40-8" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">"mid_price_change_next"</span>] <span class="op">=</span> df[<span class="st">"mid_price_change"</span>].shift(<span class="op">-</span><span class="dv">1</span>)</span>
+<span id="cb40-9"><a href="#cb40-9" aria-hidden="true" tabindex="-1"></a>    results <span class="op">=</span> Results()</span>
+<span id="cb40-10"><a href="#cb40-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">0</span>, <span class="bu">len</span>(df), every):</span>
+<span id="cb40-11"><a href="#cb40-11" aria-hidden="true" tabindex="-1"></a>        model <span class="op">=</span> smf.ols(</span>
+<span id="cb40-12"><a href="#cb40-12" aria-hidden="true" tabindex="-1"></a>            <span class="st">"mid_price_change_next ~ order_flow_imbalance"</span>,</span>
+<span id="cb40-13"><a href="#cb40-13" aria-hidden="true" tabindex="-1"></a>            data<span class="op">=</span>df.iloc[i : i <span class="op">+</span> every],</span>
+<span id="cb40-14"><a href="#cb40-14" aria-hidden="true" tabindex="-1"></a>            missing<span class="op">=</span><span class="st">"drop"</span>,</span>
+<span id="cb40-15"><a href="#cb40-15" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb40-16"><a href="#cb40-16" aria-hidden="true" tabindex="-1"></a>        res <span class="op">=</span> model.fit(cov_type<span class="op">=</span><span class="st">"HAC"</span>, cov_kwds<span class="op">=</span>{<span class="st">"maxlags"</span>: <span class="bu">int</span>(every<span class="op">**</span><span class="fl">0.25</span>)})</span>
+<span id="cb40-17"><a href="#cb40-17" aria-hidden="true" tabindex="-1"></a>        results.alphas.append(res.params[<span class="st">"Intercept"</span>])</span>
+<span id="cb40-18"><a href="#cb40-18" aria-hidden="true" tabindex="-1"></a>        results.betas.append(res.params[<span class="st">"order_flow_imbalance"</span>])</span>
+<span id="cb40-19"><a href="#cb40-19" aria-hidden="true" tabindex="-1"></a>        results.alphas_p.append(res.pvalues[<span class="st">"Intercept"</span>])</span>
+<span id="cb40-20"><a href="#cb40-20" aria-hidden="true" tabindex="-1"></a>        results.betas_p.append(res.pvalues[<span class="st">"order_flow_imbalance"</span>])</span>
+<span id="cb40-21"><a href="#cb40-21" aria-hidden="true" tabindex="-1"></a>        results.r2.append(res.rsquared)</span>
+<span id="cb40-22"><a href="#cb40-22" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> results</span>
+<span id="cb40-23"><a href="#cb40-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-24"><a href="#cb40-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-25"><a href="#cb40-25" aria-hidden="true" tabindex="-1"></a>btc_results_fwd <span class="op">=</span> estimate_regressions_fwd(<span class="st">"BTCUSD_PERP"</span>, <span class="st">"./data/ticker"</span>)</span>
+<span id="cb40-26"><a href="#cb40-26" aria-hidden="true" tabindex="-1"></a>eth_results_fwd <span class="op">=</span> estimate_regressions_fwd(<span class="st">"ETHUSD_PERP"</span>, <span class="st">"./data/ticker"</span>)</span>
+<span id="cb40-27"><a href="#cb40-27" aria-hidden="true" tabindex="-1"></a>sol_results_fwd <span class="op">=</span> estimate_regressions_fwd(<span class="st">"SOLUSD_PERP"</span>, <span class="st">"./data/ticker"</span>)</span>
+<span id="cb40-28"><a href="#cb40-28" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(btc_results_fwd.summarize())</span>
+<span id="cb40-29"><a href="#cb40-29" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(eth_results_fwd.summarize())</span>
+<span id="cb40-30"><a href="#cb40-30" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(sol_results_fwd.summarize())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>   signif_alphas  signif_betas    avg_r2
+0       0.032895      0.412418  0.026467
+   signif_alphas  signif_betas    avg_r2
+0       0.035773      0.292626  0.017402
+   signif_alphas  signif_betas    avg_r2
+0       0.038377      0.124863  0.008959</code></pre>
+</div>
+</div>
+<p>Another concern is we are trying to estimate changes in price levels instead of returns, which means it must be estimated on a per asset basis. I’m curious if there’s any generalization across the contracts. Going forward, I will try to implement a more practical model.</p>
+</section>
+<section id="can-we-use-ofi-as-a-signal" class="level1">
+<h1>Can we use OFI as a signal?</h1>
+<p>To start, I want to have returns over the 10s intervals. I also want to do standardizations on the OFI. I will define returns as the change in the final midprice of one interval to the next. But everything done can be repeated for the bid/ask price as well.</p>
+<div id="cell-49" class="cell" data-execution_count="28">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>symbols <span class="op">=</span> [<span class="st">"BTCUSD_PERP"</span>, <span class="st">"ETHUSD_PERP"</span>, <span class="st">"SOLUSD_PERP"</span>]</span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>data_dir <span class="op">=</span> <span class="st">"./data/ticker"</span></span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> symbol <span class="kw">in</span> symbols:</span>
+<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">with</span> duckdb.<span class="ex">connect</span>(<span class="ss">f"</span><span class="sc">{</span>data_dir<span class="sc">}</span><span class="ss">/</span><span class="sc">{</span>symbol<span class="sc">}</span><span class="ss">.db"</span>) <span class="im">as</span> con:</span>
+<span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a>        con.execute(</span>
+<span id="cb42-6"><a href="#cb42-6" aria-hidden="true" tabindex="-1"></a>            <span class="ss">f"""</span></span>
+<span id="cb42-7"><a href="#cb42-7" aria-hidden="true" tabindex="-1"></a><span class="ss">                    CREATE TABLE close_10s AS</span></span>
+<span id="cb42-8"><a href="#cb42-8" aria-hidden="true" tabindex="-1"></a><span class="ss">                    WITH base_data AS (</span></span>
+<span id="cb42-9"><a href="#cb42-9" aria-hidden="true" tabindex="-1"></a><span class="ss">                        SELECT </span></span>
+<span id="cb42-10"><a href="#cb42-10" aria-hidden="true" tabindex="-1"></a><span class="ss">                            transaction_time,</span></span>
+<span id="cb42-11"><a href="#cb42-11" aria-hidden="true" tabindex="-1"></a><span class="ss">                            mid_price,</span></span>
+<span id="cb42-12"><a href="#cb42-12" aria-hidden="true" tabindex="-1"></a><span class="ss">                            symbol,</span></span>
+<span id="cb42-13"><a href="#cb42-13" aria-hidden="true" tabindex="-1"></a><span class="ss">                            date_trunc('year', MIN(transaction_time) OVER ()) AS min_time</span></span>
+<span id="cb42-14"><a href="#cb42-14" aria-hidden="true" tabindex="-1"></a><span class="ss">                        FROM tick</span></span>
+<span id="cb42-15"><a href="#cb42-15" aria-hidden="true" tabindex="-1"></a><span class="ss">                    )</span></span>
+<span id="cb42-16"><a href="#cb42-16" aria-hidden="true" tabindex="-1"></a><span class="ss">                    SELECT</span></span>
+<span id="cb42-17"><a href="#cb42-17" aria-hidden="true" tabindex="-1"></a><span class="ss">                        MAX_BY(mid_price, transaction_time) AS close_price,</span></span>
+<span id="cb42-18"><a href="#cb42-18" aria-hidden="true" tabindex="-1"></a><span class="ss">                        symbol,</span></span>
+<span id="cb42-19"><a href="#cb42-19" aria-hidden="true" tabindex="-1"></a><span class="ss">                        (min_time + INTERVAL '10 seconds' * (FLOOR(DATE_PART('epoch', transaction_time - min_time) / 10) + 1)::INT) AS time_bucket_end</span></span>
+<span id="cb42-20"><a href="#cb42-20" aria-hidden="true" tabindex="-1"></a><span class="ss">                    FROM base_data</span></span>
+<span id="cb42-21"><a href="#cb42-21" aria-hidden="true" tabindex="-1"></a><span class="ss">                    GROUP BY symbol, min_time + INTERVAL '10 seconds' * (FLOOR(DATE_PART('epoch', transaction_time - min_time) / 10) + 1)::INT</span></span>
+<span id="cb42-22"><a href="#cb42-22" aria-hidden="true" tabindex="-1"></a><span class="ss">                    ORDER BY time_bucket_end</span></span>
+<span id="cb42-23"><a href="#cb42-23" aria-hidden="true" tabindex="-1"></a><span class="ss">                    """</span></span>
+<span id="cb42-24"><a href="#cb42-24" aria-hidden="true" tabindex="-1"></a>        )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div id="cell-50" class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>symbols <span class="op">=</span> [<span class="st">"BTCUSD_PERP"</span>, <span class="st">"ETHUSD_PERP"</span>, <span class="st">"SOLUSD_PERP"</span>]</span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>data_dir <span class="op">=</span> <span class="st">"./data/ticker"</span></span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> symbol <span class="kw">in</span> symbols:</span>
+<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">with</span> duckdb.<span class="ex">connect</span>(<span class="ss">f"</span><span class="sc">{</span>data_dir<span class="sc">}</span><span class="ss">/</span><span class="sc">{</span>symbol<span class="sc">}</span><span class="ss">.db"</span>) <span class="im">as</span> con:</span>
+<span id="cb43-5"><a href="#cb43-5" aria-hidden="true" tabindex="-1"></a>        con.execute(</span>
+<span id="cb43-6"><a href="#cb43-6" aria-hidden="true" tabindex="-1"></a>            <span class="ss">f"""</span></span>
+<span id="cb43-7"><a href="#cb43-7" aria-hidden="true" tabindex="-1"></a><span class="ss">                    CREATE TABLE open_10s AS</span></span>
+<span id="cb43-8"><a href="#cb43-8" aria-hidden="true" tabindex="-1"></a><span class="ss">                    WITH base_data AS (</span></span>
+<span id="cb43-9"><a href="#cb43-9" aria-hidden="true" tabindex="-1"></a><span class="ss">                        SELECT </span></span>
+<span id="cb43-10"><a href="#cb43-10" aria-hidden="true" tabindex="-1"></a><span class="ss">                            transaction_time,</span></span>
+<span id="cb43-11"><a href="#cb43-11" aria-hidden="true" tabindex="-1"></a><span class="ss">                            mid_price,</span></span>
+<span id="cb43-12"><a href="#cb43-12" aria-hidden="true" tabindex="-1"></a><span class="ss">                            symbol,</span></span>
+<span id="cb43-13"><a href="#cb43-13" aria-hidden="true" tabindex="-1"></a><span class="ss">                            date_trunc('year', MIN(transaction_time) OVER ()) AS min_time</span></span>
+<span id="cb43-14"><a href="#cb43-14" aria-hidden="true" tabindex="-1"></a><span class="ss">                        FROM tick</span></span>
+<span id="cb43-15"><a href="#cb43-15" aria-hidden="true" tabindex="-1"></a><span class="ss">                    )</span></span>
+<span id="cb43-16"><a href="#cb43-16" aria-hidden="true" tabindex="-1"></a><span class="ss">                    SELECT</span></span>
+<span id="cb43-17"><a href="#cb43-17" aria-hidden="true" tabindex="-1"></a><span class="ss">                        MIN_BY(mid_price, transaction_time) AS open_price,</span></span>
+<span id="cb43-18"><a href="#cb43-18" aria-hidden="true" tabindex="-1"></a><span class="ss">                        symbol,</span></span>
+<span id="cb43-19"><a href="#cb43-19" aria-hidden="true" tabindex="-1"></a><span class="ss">                        (min_time + INTERVAL '10 seconds' * (FLOOR(DATE_PART('epoch', transaction_time - min_time) / 10) + 1)::INT) AS time_bucket_end</span></span>
+<span id="cb43-20"><a href="#cb43-20" aria-hidden="true" tabindex="-1"></a><span class="ss">                    FROM base_data</span></span>
+<span id="cb43-21"><a href="#cb43-21" aria-hidden="true" tabindex="-1"></a><span class="ss">                    GROUP BY symbol, min_time + INTERVAL '10 seconds' * (FLOOR(DATE_PART('epoch', transaction_time - min_time) / 10) + 1)::INT</span></span>
+<span id="cb43-22"><a href="#cb43-22" aria-hidden="true" tabindex="-1"></a><span class="ss">                    ORDER BY time_bucket_end</span></span>
+<span id="cb43-23"><a href="#cb43-23" aria-hidden="true" tabindex="-1"></a><span class="ss">                    """</span></span>
+<span id="cb43-24"><a href="#cb43-24" aria-hidden="true" tabindex="-1"></a>        )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div id="cell-51" class="cell" data-execution_count="31">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> collect_data():</span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>    ofi_dfs <span class="op">=</span> []</span>
+<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a>    close_dfs <span class="op">=</span> []</span>
+<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> symbol <span class="kw">in</span> symbols:</span>
+<span id="cb44-5"><a href="#cb44-5" aria-hidden="true" tabindex="-1"></a>        <span class="cf">with</span> duckdb.<span class="ex">connect</span>(<span class="ss">f"</span><span class="sc">{</span>data_dir<span class="sc">}</span><span class="ss">/</span><span class="sc">{</span>symbol<span class="sc">}</span><span class="ss">.db"</span>) <span class="im">as</span> con:</span>
+<span id="cb44-6"><a href="#cb44-6" aria-hidden="true" tabindex="-1"></a>            ofi_df <span class="op">=</span> con.sql(<span class="st">"SELECT * FROM agg_10s"</span>).to_df()</span>
+<span id="cb44-7"><a href="#cb44-7" aria-hidden="true" tabindex="-1"></a>            close_df <span class="op">=</span> con.sql(<span class="st">"SELECT * FROM close_10s"</span>).to_df()</span>
+<span id="cb44-8"><a href="#cb44-8" aria-hidden="true" tabindex="-1"></a>            ofi_dfs.append(ofi_df)</span>
+<span id="cb44-9"><a href="#cb44-9" aria-hidden="true" tabindex="-1"></a>            close_dfs.append(close_df)</span>
+<span id="cb44-10"><a href="#cb44-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> ofi_dfs, close_dfs</span>
+<span id="cb44-11"><a href="#cb44-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-12"><a href="#cb44-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-13"><a href="#cb44-13" aria-hidden="true" tabindex="-1"></a>ofi_dfs, close_dfs <span class="op">=</span> collect_data()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div id="cell-52" class="cell" data-execution_count="108">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> df1, df2 <span class="kw">in</span> <span class="bu">zip</span>(ofi_dfs, close_dfs):</span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a>    df1[<span class="st">"close_price"</span>] <span class="op">=</span> df2[<span class="st">"close_price"</span>]</span>
+<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a>    df1[<span class="st">"returns"</span>] <span class="op">=</span> df2[<span class="st">"close_price"</span>].pct_change()</span>
+<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a>    <span class="kw">del</span> df2</span>
+<span id="cb45-5"><a href="#cb45-5" aria-hidden="true" tabindex="-1"></a><span class="kw">del</span> close_dfs</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>For standardization of OFI, I will use a rolling window of 1 minutes to compute z-scores. This is to account for the different levels of activity in the three contracts. I will then use the z-scores in the regression model.</p>
+<div id="cell-54" class="cell" data-execution_count="74">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> df <span class="kw">in</span> ofi_dfs:</span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">"returns_next"</span>] <span class="op">=</span> df[<span class="st">"returns"</span>].shift(<span class="op">-</span><span class="dv">1</span>)</span>
+<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">"ofi_rolling_mean"</span>] <span class="op">=</span> df[<span class="st">"order_flow_imbalance"</span>].rolling(<span class="dv">6</span>).mean()</span>
+<span id="cb46-4"><a href="#cb46-4" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">"ofi_rolling_std"</span>] <span class="op">=</span> df[<span class="st">"order_flow_imbalance"</span>].rolling(<span class="dv">6</span>).std()</span>
+<span id="cb46-5"><a href="#cb46-5" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">"ofi_z"</span>] <span class="op">=</span> (df[<span class="st">"order_flow_imbalance"</span>] <span class="op">-</span> df[<span class="st">"ofi_rolling_mean"</span>]) <span class="op">/</span> df[</span>
+<span id="cb46-6"><a href="#cb46-6" aria-hidden="true" tabindex="-1"></a>        <span class="st">"ofi_rolling_std"</span></span>
+<span id="cb46-7"><a href="#cb46-7" aria-hidden="true" tabindex="-1"></a>    ]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div id="cell-55" class="cell" data-execution_count="85">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> df <span class="kw">in</span> ofi_dfs:</span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a>    sns.lineplot(data<span class="op">=</span>df[<span class="dv">1000</span>:<span class="dv">2000</span>], x<span class="op">=</span><span class="st">"time_bucket_end"</span>, y<span class="op">=</span><span class="st">"ofi_z"</span>, alpha<span class="op">=</span><span class="fl">0.7</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Analysis_files/figure-html/cell-34-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The standardization seems to put the OFI in the same range for all three contracts. A quick visualization for a thirty minute period doesn’t show any obvious relationship between OFI and next 10s returns.</p>
+<div id="cell-57" class="cell" data-execution_count="90">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> df <span class="kw">in</span> ofi_dfs:</span>
+<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a>    sns.scatterplot(data<span class="op">=</span>df.iloc[<span class="dv">4000</span>:<span class="dv">4180</span>], x<span class="op">=</span><span class="st">"ofi_z"</span>, y<span class="op">=</span><span class="st">"returns_next"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Analysis_files/figure-html/cell-35-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>But I will repeat the procedure from above anyways.</p>
+<div id="cell-59" class="cell" data-execution_count="94">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Results:</span>
+<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>):</span>
+<span id="cb49-3"><a href="#cb49-3" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.alphas <span class="op">=</span> []</span>
+<span id="cb49-4"><a href="#cb49-4" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.betas <span class="op">=</span> []</span>
+<span id="cb49-5"><a href="#cb49-5" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.alphas_p <span class="op">=</span> []</span>
+<span id="cb49-6"><a href="#cb49-6" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.betas_p <span class="op">=</span> []</span>
+<span id="cb49-7"><a href="#cb49-7" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.betas_t <span class="op">=</span> []</span>
+<span id="cb49-8"><a href="#cb49-8" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.r2 <span class="op">=</span> []</span>
+<span id="cb49-9"><a href="#cb49-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-10"><a href="#cb49-10" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> summarize(<span class="va">self</span>):</span>
+<span id="cb49-11"><a href="#cb49-11" aria-hidden="true" tabindex="-1"></a>        signif_alphas <span class="op">=</span> np.<span class="bu">sum</span>(np.array(<span class="va">self</span>.alphas_p) <span class="op">&lt;</span> <span class="fl">0.05</span>) <span class="op">/</span> <span class="bu">len</span>(<span class="va">self</span>.alphas_p)</span>
+<span id="cb49-12"><a href="#cb49-12" aria-hidden="true" tabindex="-1"></a>        signif_betas <span class="op">=</span> np.<span class="bu">sum</span>(np.array(<span class="va">self</span>.betas_p) <span class="op">&lt;</span> <span class="fl">0.05</span>) <span class="op">/</span> <span class="bu">len</span>(<span class="va">self</span>.betas_p)</span>
+<span id="cb49-13"><a href="#cb49-13" aria-hidden="true" tabindex="-1"></a>        avg_r2 <span class="op">=</span> np.mean(<span class="va">self</span>.r2)</span>
+<span id="cb49-14"><a href="#cb49-14" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> pd.DataFrame(</span>
+<span id="cb49-15"><a href="#cb49-15" aria-hidden="true" tabindex="-1"></a>            {</span>
+<span id="cb49-16"><a href="#cb49-16" aria-hidden="true" tabindex="-1"></a>                <span class="st">"signif_alphas"</span>: [signif_alphas],</span>
+<span id="cb49-17"><a href="#cb49-17" aria-hidden="true" tabindex="-1"></a>                <span class="st">"signif_betas"</span>: [signif_betas],</span>
+<span id="cb49-18"><a href="#cb49-18" aria-hidden="true" tabindex="-1"></a>                <span class="st">"avg_t"</span>: [np.mean(<span class="va">self</span>.betas_t)],</span>
+<span id="cb49-19"><a href="#cb49-19" aria-hidden="true" tabindex="-1"></a>                <span class="st">"avg_r2"</span>: [avg_r2],</span>
+<span id="cb49-20"><a href="#cb49-20" aria-hidden="true" tabindex="-1"></a>            }</span>
+<span id="cb49-21"><a href="#cb49-21" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb49-22"><a href="#cb49-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-23"><a href="#cb49-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-24"><a href="#cb49-24" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> global_summary(<span class="op">*</span>results):</span>
+<span id="cb49-25"><a href="#cb49-25" aria-hidden="true" tabindex="-1"></a>    dfs <span class="op">=</span> [result.summarize() <span class="cf">for</span> result <span class="kw">in</span> results]</span>
+<span id="cb49-26"><a href="#cb49-26" aria-hidden="true" tabindex="-1"></a>    concacted <span class="op">=</span> pd.concat(dfs)</span>
+<span id="cb49-27"><a href="#cb49-27" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> concacted.mean()</span>
+<span id="cb49-28"><a href="#cb49-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-29"><a href="#cb49-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-30"><a href="#cb49-30" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> estimate_regressions(df, every<span class="op">=</span><span class="dv">180</span>):</span>
+<span id="cb49-31"><a href="#cb49-31" aria-hidden="true" tabindex="-1"></a>    results <span class="op">=</span> Results()</span>
+<span id="cb49-32"><a href="#cb49-32" aria-hidden="true" tabindex="-1"></a>    df <span class="op">=</span> df.dropna()</span>
+<span id="cb49-33"><a href="#cb49-33" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">0</span>, <span class="bu">len</span>(df), every):</span>
+<span id="cb49-34"><a href="#cb49-34" aria-hidden="true" tabindex="-1"></a>        model <span class="op">=</span> smf.ols(<span class="st">"returns_next ~ ofi_z"</span>, data<span class="op">=</span>df.iloc[i : i <span class="op">+</span> every])</span>
+<span id="cb49-35"><a href="#cb49-35" aria-hidden="true" tabindex="-1"></a>        res <span class="op">=</span> model.fit(cov_type<span class="op">=</span><span class="st">"HAC"</span>, cov_kwds<span class="op">=</span>{<span class="st">"maxlags"</span>: <span class="bu">int</span>(every<span class="op">**</span><span class="fl">0.25</span>)})</span>
+<span id="cb49-36"><a href="#cb49-36" aria-hidden="true" tabindex="-1"></a>        results.alphas.append(res.params[<span class="st">"Intercept"</span>])</span>
+<span id="cb49-37"><a href="#cb49-37" aria-hidden="true" tabindex="-1"></a>        results.betas.append(res.params[<span class="st">"ofi_z"</span>])</span>
+<span id="cb49-38"><a href="#cb49-38" aria-hidden="true" tabindex="-1"></a>        results.alphas_p.append(res.pvalues[<span class="st">"Intercept"</span>])</span>
+<span id="cb49-39"><a href="#cb49-39" aria-hidden="true" tabindex="-1"></a>        results.betas_p.append(res.pvalues[<span class="st">"ofi_z"</span>])</span>
+<span id="cb49-40"><a href="#cb49-40" aria-hidden="true" tabindex="-1"></a>        results.betas_t.append(res.tvalues[<span class="st">"ofi_z"</span>])</span>
+<span id="cb49-41"><a href="#cb49-41" aria-hidden="true" tabindex="-1"></a>        results.r2.append(res.rsquared)</span>
+<span id="cb49-42"><a href="#cb49-42" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> results</span>
+<span id="cb49-43"><a href="#cb49-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-44"><a href="#cb49-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-45"><a href="#cb49-45" aria-hidden="true" tabindex="-1"></a>btc_results <span class="op">=</span> estimate_regressions(ofi_dfs[<span class="dv">0</span>])</span>
+<span id="cb49-46"><a href="#cb49-46" aria-hidden="true" tabindex="-1"></a>eth_results <span class="op">=</span> estimate_regressions(ofi_dfs[<span class="dv">1</span>])</span>
+<span id="cb49-47"><a href="#cb49-47" aria-hidden="true" tabindex="-1"></a>sol_results <span class="op">=</span> estimate_regressions(ofi_dfs[<span class="dv">2</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div id="cell-60" class="cell" data-execution_count="95">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(btc_results.summarize())</span>
+<span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(eth_results.summarize())</span>
+<span id="cb50-3"><a href="#cb50-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(sol_results.summarize())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>   signif_alphas  signif_betas    avg_t    avg_r2
+0       0.040159       0.39693  1.64369  0.023374
+   signif_alphas  signif_betas     avg_t    avg_r2
+0       0.037144      0.294819  1.273421  0.016652
+   signif_alphas  signif_betas     avg_t    avg_r2
+0        0.03687      0.111431  0.472614  0.008378</code></pre>
+</div>
+</div>
+<p>It’s about what we expect. Let’s also run a regression over all the data with all the contracts pooled together.</p>
+<div id="cell-62" class="cell" data-execution_count="101">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> estimate_regressions_pooled(ofi_dfs):</span>
+<span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a>    df <span class="op">=</span> pd.concat(ofi_dfs)</span>
+<span id="cb52-3"><a href="#cb52-3" aria-hidden="true" tabindex="-1"></a>    df <span class="op">=</span> df.dropna()</span>
+<span id="cb52-4"><a href="#cb52-4" aria-hidden="true" tabindex="-1"></a>    model <span class="op">=</span> smf.ols(<span class="st">"returns_next ~ ofi_z"</span>, data<span class="op">=</span>df)</span>
+<span id="cb52-5"><a href="#cb52-5" aria-hidden="true" tabindex="-1"></a>    res <span class="op">=</span> model.fit(cov_type<span class="op">=</span><span class="st">"HAC"</span>, cov_kwds<span class="op">=</span>{<span class="st">"maxlags"</span>: <span class="bu">int</span>(<span class="bu">len</span>(df) <span class="op">**</span> <span class="fl">0.25</span>)})</span>
+<span id="cb52-6"><a href="#cb52-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> res</span>
+<span id="cb52-7"><a href="#cb52-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb52-8"><a href="#cb52-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb52-9"><a href="#cb52-9" aria-hidden="true" tabindex="-1"></a>pooled_results <span class="op">=</span> estimate_regressions_pooled(ofi_dfs)</span>
+<span id="cb52-10"><a href="#cb52-10" aria-hidden="true" tabindex="-1"></a>pooled_results.summary()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="101">
+<div>
+<table class="simpletable table table-sm table-striped small" data-quarto-postprocess="true">
+<caption>OLS Regression Results</caption>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Dep. Variable:</td>
+<td>returns_next</td>
+<td data-quarto-table-cell-role="th">R-squared:</td>
+<td>0.002</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Model:</td>
+<td>OLS</td>
+<td data-quarto-table-cell-role="th">Adj. R-squared:</td>
+<td>0.002</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Method:</td>
+<td>Least Squares</td>
+<td data-quarto-table-cell-role="th">F-statistic:</td>
+<td>6631.</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Date:</td>
+<td>Sat, 29 Jun 2024</td>
+<td data-quarto-table-cell-role="th">Prob (F-statistic):</td>
+<td>0.00</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Time:</td>
+<td>23:31:47</td>
+<td data-quarto-table-cell-role="th">Log-Likelihood:</td>
+<td>2.4757e+07</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">No. Observations:</td>
+<td>3939822</td>
+<td data-quarto-table-cell-role="th">AIC:</td>
+<td>-4.951e+07</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Df Residuals:</td>
+<td>3939820</td>
+<td data-quarto-table-cell-role="th">BIC:</td>
+<td>-4.951e+07</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Df Model:</td>
+<td>1</td>
+<td data-quarto-table-cell-role="th"></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Covariance Type:</td>
+<td>HAC</td>
+<td data-quarto-table-cell-role="th"></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<table class="simpletable table table-sm table-striped small" data-quarto-postprocess="true">
+<tbody>
+<tr class="odd">
+<td></td>
+<td data-quarto-table-cell-role="th">coef</td>
+<td data-quarto-table-cell-role="th">std err</td>
+<td data-quarto-table-cell-role="th">z</td>
+<td data-quarto-table-cell-role="th">P&gt;|z|</td>
+<td data-quarto-table-cell-role="th">[0.025</td>
+<td data-quarto-table-cell-role="th">0.975]</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Intercept</td>
+<td>4.952e-07</td>
+<td>2.26e-07</td>
+<td>2.187</td>
+<td>0.029</td>
+<td>5.14e-08</td>
+<td>9.39e-07</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">ofi_z</td>
+<td>2.202e-05</td>
+<td>2.7e-07</td>
+<td>81.431</td>
+<td>0.000</td>
+<td>2.15e-05</td>
+<td>2.25e-05</td>
+</tr>
+</tbody>
+</table>
+<table class="simpletable table table-sm table-striped small" data-quarto-postprocess="true">
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Omnibus:</td>
+<td>2017399.515</td>
+<td data-quarto-table-cell-role="th">Durbin-Watson:</td>
+<td>1.985</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Prob(Omnibus):</td>
+<td>0.000</td>
+<td data-quarto-table-cell-role="th">Jarque-Bera (JB):</td>
+<td>13986223540.388</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Skew:</td>
+<td>-0.576</td>
+<td data-quarto-table-cell-role="th">Prob(JB):</td>
+<td>0.00</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Kurtosis:</td>
+<td>294.887</td>
+<td data-quarto-table-cell-role="th">Cond. No.</td>
+<td>1.08</td>
+</tr>
+</tbody>
+</table>
+<br><br>Notes:<br>[1] Standard Errors are heteroscedasticity and autocorrelation robust (HAC) using 44 lags and without small sample correction
+</div>
+</div>
+</div>
+<p>We get a significant coefficient, but it’s very bad at explaining the variance. So this normalized OFI does have useful information; it’s a question of how to use it. Going back to the regressions for next 10s returns partitioned over the thirty minute intervals, perhaps a hypothesis to test is if the estimated <span class="math inline">\(\hat{\beta}\)</span> is significant in a thirty minute interval (by t-stat) then it will relatively do worse in the next thirty minute interval.</p>
+<div id="cell-64" class="cell" data-execution_count="206">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb53"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> get_times(every<span class="op">=</span><span class="dv">180</span>):</span>
+<span id="cb53-2"><a href="#cb53-2" aria-hidden="true" tabindex="-1"></a>    df <span class="op">=</span> ofi_dfs[<span class="dv">0</span>]</span>
+<span id="cb53-3"><a href="#cb53-3" aria-hidden="true" tabindex="-1"></a>    times <span class="op">=</span> []</span>
+<span id="cb53-4"><a href="#cb53-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">0</span>, <span class="bu">len</span>(df), every):</span>
+<span id="cb53-5"><a href="#cb53-5" aria-hidden="true" tabindex="-1"></a>        times.append(df.iloc[i].time_bucket_end)</span>
+<span id="cb53-6"><a href="#cb53-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> times</span>
+<span id="cb53-7"><a href="#cb53-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb53-8"><a href="#cb53-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb53-9"><a href="#cb53-9" aria-hidden="true" tabindex="-1"></a>times <span class="op">=</span> get_times()</span>
+<span id="cb53-10"><a href="#cb53-10" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> <span class="bu">len</span>(times) <span class="op">==</span> <span class="bu">len</span>(btc_results.betas_t)</span>
+<span id="cb53-11"><a href="#cb53-11" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> <span class="bu">len</span>(times) <span class="op">==</span> <span class="bu">len</span>(eth_results.betas_t)</span>
+<span id="cb53-12"><a href="#cb53-12" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> <span class="bu">len</span>(times) <span class="op">==</span> <span class="bu">len</span>(sol_results.betas_t)</span>
+<span id="cb53-13"><a href="#cb53-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb53-14"><a href="#cb53-14" aria-hidden="true" tabindex="-1"></a>btc_t_arr <span class="op">=</span> np.array(btc_results.betas_t)</span>
+<span id="cb53-15"><a href="#cb53-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb53-16"><a href="#cb53-16" aria-hidden="true" tabindex="-1"></a>eth_t_arr <span class="op">=</span> np.array(eth_results.betas_t)</span>
+<span id="cb53-17"><a href="#cb53-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb53-18"><a href="#cb53-18" aria-hidden="true" tabindex="-1"></a>sol_t_arr <span class="op">=</span> np.array(sol_results.betas_t)</span>
+<span id="cb53-19"><a href="#cb53-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb53-20"><a href="#cb53-20" aria-hidden="true" tabindex="-1"></a>t_arr <span class="op">=</span> np.column_stack((btc_t_arr, eth_t_arr, sol_t_arr))</span>
+<span id="cb53-21"><a href="#cb53-21" aria-hidden="true" tabindex="-1"></a>signal <span class="op">=</span> <span class="op">-</span>t_arr <span class="op">/</span> np.<span class="bu">abs</span>(t_arr).<span class="bu">sum</span>(axis<span class="op">=</span><span class="dv">1</span>)[:, <span class="va">None</span>]</span>
+<span id="cb53-22"><a href="#cb53-22" aria-hidden="true" tabindex="-1"></a>signal[np.isnan(signal)] <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb53-23"><a href="#cb53-23" aria-hidden="true" tabindex="-1"></a>signal <span class="op">=</span> signal[:<span class="op">-</span><span class="dv">1</span>]</span>
+<span id="cb53-24"><a href="#cb53-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb53-25"><a href="#cb53-25" aria-hidden="true" tabindex="-1"></a>tradeable_times <span class="op">=</span> [t <span class="op">+</span> pd.Timedelta(seconds<span class="op">=</span><span class="dv">20</span>) <span class="cf">for</span> t <span class="kw">in</span> times[<span class="dv">1</span>:]]</span>
+<span id="cb53-26"><a href="#cb53-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb53-27"><a href="#cb53-27" aria-hidden="true" tabindex="-1"></a>returns_arr <span class="op">=</span> np.column_stack(</span>
+<span id="cb53-28"><a href="#cb53-28" aria-hidden="true" tabindex="-1"></a>    [df.loc[df.time_bucket_end.isin(tradeable_times)][<span class="st">"returns"</span>] <span class="cf">for</span> df <span class="kw">in</span> ofi_dfs]</span>
+<span id="cb53-29"><a href="#cb53-29" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb53-30"><a href="#cb53-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb53-31"><a href="#cb53-31" aria-hidden="true" tabindex="-1"></a>pd.DataFrame(</span>
+<span id="cb53-32"><a href="#cb53-32" aria-hidden="true" tabindex="-1"></a>    {</span>
+<span id="cb53-33"><a href="#cb53-33" aria-hidden="true" tabindex="-1"></a>        <span class="st">"cumulative_returns"</span>: (signal <span class="op">*</span> returns_arr).<span class="bu">sum</span>(axis<span class="op">=</span><span class="dv">1</span>).cumsum(),</span>
+<span id="cb53-34"><a href="#cb53-34" aria-hidden="true" tabindex="-1"></a>        <span class="st">"time"</span>: tradeable_times,</span>
+<span id="cb53-35"><a href="#cb53-35" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb53-36"><a href="#cb53-36" aria-hidden="true" tabindex="-1"></a>).plot(x<span class="op">=</span><span class="st">"time"</span>, y<span class="op">=</span><span class="st">"cumulative_returns"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Analysis_files/figure-html/cell-39-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Well, that might just be noise. Maybe, life is simpler and we can use the OFI z-scores directly to weight a portfolio.</p>
+<div id="cell-66" class="cell" data-execution_count="208">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb54"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a>ofi_arr <span class="op">=</span> np.column_stack([df.dropna()[<span class="st">"ofi_z"</span>] <span class="cf">for</span> df <span class="kw">in</span> ofi_dfs])</span>
+<span id="cb54-2"><a href="#cb54-2" aria-hidden="true" tabindex="-1"></a>ret_next_arr <span class="op">=</span> np.column_stack([df.dropna()[<span class="st">"returns_next"</span>] <span class="cf">for</span> df <span class="kw">in</span> ofi_dfs])</span>
+<span id="cb54-3"><a href="#cb54-3" aria-hidden="true" tabindex="-1"></a>ofi_signal <span class="op">=</span> ofi_arr <span class="op">/</span> np.<span class="bu">abs</span>(ofi_arr).<span class="bu">sum</span>(axis<span class="op">=</span><span class="dv">1</span>)[:, <span class="va">None</span>]</span>
+<span id="cb54-4"><a href="#cb54-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-5"><a href="#cb54-5" aria-hidden="true" tabindex="-1"></a>pd.DataFrame(</span>
+<span id="cb54-6"><a href="#cb54-6" aria-hidden="true" tabindex="-1"></a>    {</span>
+<span id="cb54-7"><a href="#cb54-7" aria-hidden="true" tabindex="-1"></a>        <span class="st">"cumulative_returns"</span>: (ofi_signal <span class="op">*</span> ret_next_arr).<span class="bu">sum</span>(axis<span class="op">=</span><span class="dv">1</span>).cumsum(),</span>
+<span id="cb54-8"><a href="#cb54-8" aria-hidden="true" tabindex="-1"></a>        <span class="st">"time"</span>: ofi_dfs[<span class="dv">0</span>].dropna()[<span class="st">"time_bucket_end"</span>],</span>
+<span id="cb54-9"><a href="#cb54-9" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb54-10"><a href="#cb54-10" aria-hidden="true" tabindex="-1"></a>).plot(x<span class="op">=</span><span class="st">"time"</span>, y<span class="op">=</span><span class="st">"cumulative_returns"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Analysis_files/figure-html/cell-40-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Interesting, however this doesn’t account for any trading costs, bid-ask spread, and so many other things. Perhaps something similar works on a longer time scale and across many more assets. I will end here for now, however.</p>
+</section>
+<section id="conclusion" class="level1">
+<h1>Conclusion</h1>
+<p>I guess the main takeaway is contemporaneous price change can be linearly modeled with OFI even for cryptocurrency perpetual contracts. This isn’t anything new or surprising (e.g.&nbsp;<a href="http://dspace.unive.it/bitstream/handle/10579/25649/893488-1286715.pdf?sequence=2">here</a> or <a href="https://web.archive.org/web/20200325185331id_/https://link.springer.com/content/pdf/10.1007/s42521-019-00007-w.pdf">here</a>), but sometimes that’s just how science works.</p>
+<p>An avenue to explore could be thinking of Binance as the main reference for prices, then perhaps the OFI on Binance could be used to predict the price changes on other exchanges.</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  const viewSource = window.document.getElementById('quarto-view-source') ||
+                     window.document.getElementById('quarto-code-tools-source');
+  if (viewSource) {
+    const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+    viewSource.addEventListener("click", function(e) {
+      if (sourceUrl) {
+        // rstudio viewer pane
+        if (/\bcapabilities=\b/.test(window.location)) {
+          window.open(sourceUrl);
+        } else {
+          window.location.href = sourceUrl;
+        }
+      } else {
+        const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+        modal.show();
+      }
+      return false;
+    });
+  }
+  function toggleCodeHandler(show) {
+    return function(e) {
+      const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
+      for (let i=0; i<detailsSrc.length; i++) {
+        const details = detailsSrc[i].parentElement;
+        if (show) {
+          details.open = true;
+        } else {
+          details.removeAttribute("open");
+        }
+      }
+      const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+      const fromCls = show ? "hidden" : "unhidden";
+      const toCls = show ? "unhidden" : "hidden";
+      for (let i=0; i<cellCodeDivs.length; i++) {
+        const codeDiv = cellCodeDivs[i];
+        if (codeDiv.classList.contains(fromCls)) {
+          codeDiv.classList.remove(fromCls);
+          codeDiv.classList.add(toCls);
+        } 
+      }
+      return false;
+    }
+  }
+  const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+  if (hideAllCode) {
+    hideAllCode.addEventListener("click", toggleCodeHandler(false));
+  }
+  const showAllCode = window.document.getElementById("quarto-show-all-code");
+  if (showAllCode) {
+    showAllCode.addEventListener("click", toggleCodeHandler(true));
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
